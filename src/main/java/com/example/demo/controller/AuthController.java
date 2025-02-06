@@ -28,6 +28,7 @@ import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
@@ -44,8 +45,8 @@ public class AuthController {
   }
 
   @PostMapping(value = "/register",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Register a new user", description = "Registers a new user with a username and password")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "Registration successful, JWT returned", content = {
@@ -61,8 +62,8 @@ public class AuthController {
   }
 
   @PostMapping(value = "/login",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Authenticate user", description = "Authenticates a user and returns a JWT token")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "UserEntity authenticated successfully, JWT returned", content = {
@@ -77,8 +78,8 @@ public class AuthController {
   }
 
   @PostMapping(value = "/refresh",
-          consumes = MediaType.APPLICATION_JSON_VALUE,
-          produces = MediaType.APPLICATION_JSON_VALUE)
+              consumes = MediaType.APPLICATION_JSON_VALUE,
+              produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Refresh access token", description = "Generate new access token from refresh token")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "Access token refreshed successfully", content = {
@@ -93,8 +94,10 @@ public class AuthController {
   }
 
   @DeleteMapping(value = "/delete/{username}",
-          produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "Delete a user", description = "Delete a user by admin")
+                produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "Delete a user",
+            description = "Delete a user by admin",
+            security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses(value = {
           @ApiResponse(responseCode = "204", description = "UserEntity deleted successfully", content = @Content()),
           @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content()),
@@ -110,8 +113,10 @@ public class AuthController {
 
 
   @GetMapping(value = "/list",
-          produces = MediaType.APPLICATION_JSON_VALUE)
-  @Operation(summary = "List users", description = "List all users")
+             produces = MediaType.APPLICATION_JSON_VALUE)
+  @Operation(summary = "List users",
+            description = "List all users",
+            security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "List of users", content = @Content()),
           @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())

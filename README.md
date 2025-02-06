@@ -6,3 +6,6 @@ Simple CRUD application in Spring Boot 3 with
 - Hibernate
 - Actuators
 - Swagger UI 
+
+Swagger UI is available at http://localhost:8085/swagger-ui.html
+Actuators are available at http://localhost:8085/actuator

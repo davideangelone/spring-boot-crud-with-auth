@@ -1,11 +1,9 @@
 package com.example.demo.security;
 
-import java.security.Key;
 import java.util.Collection;
 import java.util.Date;
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,7 +14,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -41,25 +39,25 @@ public class JwtUtil {
 
   @PostConstruct
   private void init() {
-    accessTokenKey = new SecretKeySpec(Sha512DigestUtils.sha(jwtAccessTokenSecret), SignatureAlgorithm.HS256.getJcaName());
-    refreshTokenKey = new SecretKeySpec(Sha512DigestUtils.sha(jwtRefreshTokenSecret), SignatureAlgorithm.HS256.getJcaName());
+    accessTokenKey = Keys.hmacShaKeyFor(Sha512DigestUtils.sha(jwtAccessTokenSecret));
+    refreshTokenKey = Keys.hmacShaKeyFor(Sha512DigestUtils.sha(jwtRefreshTokenSecret));
   }
 
   public String generateAccessToken(String username, Collection<? extends GrantedAuthority> authorities) {
     return Jwts.builder()
-               .setSubject(username)
-               .setIssuedAt(new Date())
+               .subject(username)
+               .issuedAt(new Date())
                .claim("authorities", authorities)
-               .setExpiration(new Date(System.currentTimeMillis() + jwtAccessTokenExpiration))
+               .expiration(new Date(System.currentTimeMillis() + jwtAccessTokenExpiration))
                .signWith(accessTokenKey)
                .compact();
   }
 
   public String generateRefreshToken(String username) {
     return Jwts.builder()
-               .setSubject(username)
-               .setIssuedAt(new Date())
-               .setExpiration(new Date(System.currentTimeMillis() + jwtRefreshTokenExpiration))
+               .subject(username)
+               .issuedAt(new Date())
+               .expiration(new Date(System.currentTimeMillis() + jwtRefreshTokenExpiration))
                .signWith(refreshTokenKey)
                .compact();
   }
@@ -88,19 +86,19 @@ public class JwtUtil {
     }
   }
 
-  private Jws<Claims> parseToken(String token, Key key) {
-    return Jwts.parserBuilder()
-               .setSigningKey(key)
+  private Jws<Claims> parseToken(String token, SecretKey key) {
+    return Jwts.parser()
+               .verifyWith(key)
                .build()
-               .parseClaimsJws(token);
+               .parseSignedClaims(token);
   }
 
   public String getUsernameFromAccessToken(String accessToken) {
-    return parseToken(accessToken, accessTokenKey).getBody().getSubject();
+    return parseToken(accessToken, accessTokenKey).getPayload().getSubject();
   }
 
   public String getUsernameFromRefreshToken(String refreshToken) {
-    return parseToken(refreshToken, refreshTokenKey).getBody().getSubject();
+    return parseToken(refreshToken, refreshTokenKey).getPayload().getSubject();
   }
 
   public String extractToken(HttpServletRequest request) {

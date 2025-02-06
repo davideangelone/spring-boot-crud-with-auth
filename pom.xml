@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.3.7</version>
+        <version>3.4.2</version>
         <relativePath/>
     </parent>
     <groupId>com.example</groupId>
@@ -16,6 +16,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <jsonwebtoken.version>0.12.6</jsonwebtoken.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <lombok-mapstruck-bindings.version>0.2.0</lombok-mapstruck-bindings.version>
     </properties>
@@ -47,22 +48,23 @@
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-api</artifactId>
-            <version>0.11.5</version>
+            <version>${jsonwebtoken.version}</version>
         </dependency>
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-impl</artifactId>
-            <version>0.11.5</version>
+            <version>${jsonwebtoken.version}</version>
             <scope>runtime</scope>
         </dependency>
 
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt-jackson</artifactId>
-            <version>0.11.5</version>
+            <version>${jsonwebtoken.version}</version>
             <scope>runtime</scope>
         </dependency>
+
 
 
         <!-- H2 Database -->
@@ -72,26 +74,20 @@
             <scope>runtime</scope>
         </dependency>
 
-        <!-- Jakarta Persistence API dependency -->
-        <dependency>
-            <groupId>jakarta.persistence</groupId>
-            <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.1.0</version>
-        </dependency>
-
         <!-- Java Servlet API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>6.1.0</version>
             <scope>provided</scope>
         </dependency>
+
 
         <!-- Swagger/OpenAPI -->
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-            <version>2.2.0</version>
+            <version>2.8.4</version>
         </dependency>
 
         <!-- Mapstruct -->
