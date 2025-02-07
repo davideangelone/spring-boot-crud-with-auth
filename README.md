@@ -9,6 +9,7 @@ Simple CRUD application in Spring Boot 3 with
 - Actuators
 - Swagger UI 
 
-H2 console is available at http://localhost:8085/h2-console
-Swagger UI is available at http://localhost:8085/swagger-ui.html
-Actuators are available at http://localhost:8085/actuator
+## Available urls
+- H2 console is available at http://localhost:8085/h2-console
+- Swagger UI is available at http://localhost:8085/swagger-ui.html
+- Actuators are available at http://localhost:8085/actuator
