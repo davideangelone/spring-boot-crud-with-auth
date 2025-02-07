@@ -10,27 +10,27 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 
 @Aspect
 @Component
+@Slf4j
 public class LoggingAspect {
-
-  private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
   @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
   public void controllerMethods() {
   }
 
   @Before("controllerMethods()")
-  public void logRequest(JoinPoint joinPoint) {
+  public void logRequest(JoinPoint joinPoint) throws JsonProcessingException {
     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
     String methodName = signature.getName();
     String className = joinPoint.getTarget().getClass().getSimpleName();
@@ -50,21 +50,26 @@ public class LoggingAspect {
       }
     }
 
-    logger.info("Request - {}.{}: {}", className, methodName, requestParams);
+    LoggingBean loggingBean = new LoggingBean(className, methodName, "Request", requestParams);
+    log.info(loggingBean.toString());
   }
 
   @AfterReturning(pointcut = "controllerMethods()", returning = "response")
-  public void logResponse(JoinPoint joinPoint, Object response) {
+  public void logResponse(JoinPoint joinPoint, Object response) throws JsonProcessingException {
     MethodSignature signature = (MethodSignature) joinPoint.getSignature();
     String methodName = signature.getName();
     String className = joinPoint.getTarget().getClass().getSimpleName();
+    LoggingBean loggingBean = null;
 
     if (response instanceof ResponseEntity) {
-      logger.info("Response - {}.{}: Status={}, Body={}", className, methodName,
-                  ((ResponseEntity<?>) response).getStatusCode(), ((ResponseEntity<?>) response).getBody());
+      Map<String, Object> responseParams = new HashMap<>();
+      responseParams.put("status", ((ResponseEntity<?>) response).getStatusCode());
+      responseParams.put("Body", ((ResponseEntity<?>) response).getBody());
+      loggingBean = new LoggingBean(className, methodName, "Response", responseParams);
     } else {
-      logger.info("Response - {}.{}: {}", className, methodName, response);
+      loggingBean = new LoggingBean(className, methodName, "Response", response);
     }
+    log.info(loggingBean.toString());
   }
 }
 

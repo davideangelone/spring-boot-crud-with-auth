@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.core.Authentication;
@@ -45,8 +46,8 @@ public class AuthController {
   }
 
   @PostMapping(value = "/register",
-              consumes = MediaType.APPLICATION_JSON_VALUE,
-              produces = MediaType.APPLICATION_JSON_VALUE)
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Register a new user", description = "Registers a new user with a username and password")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "Registration successful, JWT returned", content = {
@@ -57,13 +58,13 @@ public class AuthController {
           @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content()),
           @ApiResponse(responseCode = "409", description = "Username already exists", content = @Content())
   })
-  public AuthenticationResponse register(@RequestBody @Valid RegisterRequest registerRequest) {
-    return authService.register(registerRequest.getUsername(), registerRequest.getPassword());
+  public ResponseEntity<AuthenticationResponse> register(@RequestBody @Valid RegisterRequest registerRequest) {
+    return ResponseEntity.ok(authService.register(registerRequest.getUsername(), registerRequest.getPassword()));
   }
 
   @PostMapping(value = "/login",
-              consumes = MediaType.APPLICATION_JSON_VALUE,
-              produces = MediaType.APPLICATION_JSON_VALUE)
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Authenticate user", description = "Authenticates a user and returns a JWT token")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "UserEntity authenticated successfully, JWT returned", content = {
@@ -73,13 +74,13 @@ public class AuthController {
           }),
           @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content())
   })
-  public AuthenticationResponse login(@RequestBody @Valid LoginRequest loginRequest) {
-    return authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+  public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid LoginRequest loginRequest) {
+    return ResponseEntity.ok().body(authService.login(loginRequest.getUsername(), loginRequest.getPassword()));
   }
 
   @PostMapping(value = "/refresh",
-              consumes = MediaType.APPLICATION_JSON_VALUE,
-              produces = MediaType.APPLICATION_JSON_VALUE)
+          consumes = MediaType.APPLICATION_JSON_VALUE,
+          produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Refresh access token", description = "Generate new access token from refresh token")
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "Access token refreshed successfully", content = {
@@ -89,15 +90,15 @@ public class AuthController {
           }),
           @ApiResponse(responseCode = "401", description = "Authentication failed", content = @Content())
   })
-  public AuthenticationResponse refreshToken(@RequestBody TokenRefreshRequest request) {
-    return authService.refresh(request.getRefreshToken());
+  public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody TokenRefreshRequest request) {
+    return ResponseEntity.ok(authService.refresh(request.getRefreshToken()));
   }
 
   @DeleteMapping(value = "/delete/{username}",
-                produces = MediaType.APPLICATION_JSON_VALUE)
+          produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "Delete a user",
-            description = "Delete a user by admin",
-            security = @SecurityRequirement(name = "bearerAuth"))
+          description = "Delete a user by admin",
+          security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses(value = {
           @ApiResponse(responseCode = "204", description = "UserEntity deleted successfully", content = @Content()),
           @ApiResponse(responseCode = "400", description = "Invalid input data", content = @Content()),
@@ -105,24 +106,24 @@ public class AuthController {
           @ApiResponse(responseCode = "404", description = "Username not found", content = @Content())
   })
   @PreAuthorize("hasRole('ADMIN')")
-  public void delete(
+  public ResponseEntity<Void> delete(
           @Parameter(description = "Username of the user to be deleted", example = "john_doe")
           @PathVariable(value = "username") String username, Authentication authentication) {
-    authService.delete(username, authentication);
+    return ResponseEntity.noContent().build();
   }
 
 
   @GetMapping(value = "/list",
-             produces = MediaType.APPLICATION_JSON_VALUE)
+          produces = MediaType.APPLICATION_JSON_VALUE)
   @Operation(summary = "List users",
-            description = "List all users",
-            security = @SecurityRequirement(name = "bearerAuth"))
+          description = "List all users",
+          security = @SecurityRequirement(name = "bearerAuth"))
   @ApiResponses(value = {
           @ApiResponse(responseCode = "200", description = "List of users", content = @Content()),
           @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content())
   })
   @PreAuthorize("hasRole('ADMIN')")
-  public List<UserModel> list() {
-    return authService.list();
+  public ResponseEntity<List<UserModel>> list() {
+    return ResponseEntity.ok(authService.list());
   }
 }
